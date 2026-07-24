@@ -1,25 +1,18 @@
+import type { Metadata } from "next";
 import Header from "@/components/Header";
-import Hero from "@/components/Hero";
-import HowItWorks from "@/components/HowItWorks";
-import LedgerPreview from "@/components/LedgerPreview";
-import SubmissionCTA from "@/components/SubmissionCTA";
-import TrustNote from "@/components/TrustNote";
-import ReferralBlock from "@/components/ReferralBlock";
-import Footer from "@/components/Footer";
+import TrialChat from "@/components/TrialChat";
+
+export const metadata: Metadata = {
+  title: "Don't Waste Our Time — Live Trial",
+  description:
+    "Justice Clockwork is in session. State your case at the bottom and watch the court rule live.",
+};
 
 export default function Home() {
   return (
-    <div className="flex flex-1 flex-col bg-background text-foreground">
+    <div className="flex min-h-dvh flex-col bg-background text-foreground">
       <Header />
-      <main className="flex flex-1 flex-col">
-        <Hero />
-        <HowItWorks />
-        <LedgerPreview />
-        <SubmissionCTA />
-        <TrustNote />
-        <ReferralBlock />
-      </main>
-      <Footer />
+      <TrialChat />
     </div>
   );
 }

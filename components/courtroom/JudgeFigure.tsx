@@ -10,10 +10,14 @@ const HAND_COLORS: Record<HandColor, string> = {
   green: "#639922",
 };
 
+const SLEEP_COLOR = "#5f6b78";
+
 type JudgeFigureProps = {
   handColor?: HandColor;
   /** Bump this to re-trigger the reaction animation, even for the same color. */
   reactKey?: number;
+  /** Something went wrong (network/API error) — the judge dozes off instead of reacting. */
+  asleep?: boolean;
   className?: string;
 };
 
@@ -27,25 +31,67 @@ function round(value: number) {
 export default function JudgeFigure({
   handColor = "gray",
   reactKey = 0,
+  asleep = false,
   className = "h-44 w-44",
 }: JudgeFigureProps) {
-  const color = HAND_COLORS[handColor];
-  const isReacting = handColor !== "gray";
+  const color = asleep ? SLEEP_COLOR : HAND_COLORS[handColor];
+  const isReacting = !asleep && handColor !== "gray";
 
   const wobble = isReacting
     ? { rotate: [0, -10, 8, -5, 0], scale: [1, 1.15, 0.95, 1.05, 1] }
     : { rotate: 0, scale: 1 };
+
+  const hourHandEnd = asleep ? { x: CX - 16, y: CY + 24 } : { x: CX + 24, y: CY + 20 };
+  const minuteHandEnd = asleep ? { x: CX + 12, y: CY + 44 } : { x: CX, y: CY - 48 };
 
   return (
     <svg
       viewBox="0 0 240 280"
       className={className}
       role="img"
-      aria-label="Justice Clockwork"
+      aria-label={asleep ? "Justice Clockwork, dozed off" : "Justice Clockwork"}
     >
-      <title>Justice Clockwork</title>
+      <title>{asleep ? "Justice Clockwork, dozed off" : "Justice Clockwork"}</title>
 
-      {/* faceless robed silhouette */}
+      <motion.g
+        animate={
+          asleep
+            ? { rotate: [0, 5, 5, 0], y: [0, 3, 3, 0] }
+            : { rotate: 0, y: 0 }
+        }
+        transition={
+          asleep
+            ? { duration: 2.6, repeat: Infinity, ease: "easeInOut", times: [0, 0.4, 0.6, 1] }
+            : { duration: 0.3 }
+        }
+        style={{ transformBox: "view-box", transformOrigin: "120px 280px" }}
+      >
+        {asleep && (
+          <g aria-hidden="true">
+            {[0, 1, 2].map((i) => (
+              <motion.text
+                key={i}
+                x={168 + i * 9}
+                y={54 - i * 10}
+                fontSize={13 - i * 2}
+                fontFamily="var(--font-mono, monospace)"
+                fill={SLEEP_COLOR}
+                initial={{ opacity: 0, y: 54 - i * 10 }}
+                animate={{ opacity: [0, 1, 1, 0], y: 54 - i * 10 - 22 }}
+                transition={{
+                  duration: 2.4,
+                  repeat: Infinity,
+                  delay: i * 0.5,
+                  ease: "easeOut",
+                }}
+              >
+                z
+              </motion.text>
+            ))}
+          </g>
+        )}
+
+        {/* faceless robed silhouette */}
       <path
         d="M32 280 L58 172 Q120 142 182 172 L208 280 Z"
         fill="var(--color-figure)"
@@ -107,11 +153,12 @@ export default function JudgeFigure({
         transition={{ duration: 0.55, ease: "easeInOut" }}
         style={{ transformBox: "view-box", transformOrigin: `${CX}px ${CY}px` }}
       >
-        <line
+        <motion.line
           x1={CX}
           y1={CY}
-          x2={CX + 24}
-          y2={CY + 20}
+          initial={{ x2: CX + 24, y2: CY + 20 }}
+          animate={{ x2: hourHandEnd.x, y2: hourHandEnd.y }}
+          transition={{ duration: 0.6, ease: "easeInOut" }}
           stroke={color}
           strokeWidth="8"
           strokeLinecap="round"
@@ -125,11 +172,12 @@ export default function JudgeFigure({
         transition={{ duration: 0.55, ease: "easeInOut", delay: 0.04 }}
         style={{ transformBox: "view-box", transformOrigin: `${CX}px ${CY}px` }}
       >
-        <line
+        <motion.line
           x1={CX}
           y1={CY}
-          x2={CX}
-          y2={CY - 48}
+          initial={{ x2: CX, y2: CY - 48 }}
+          animate={{ x2: minuteHandEnd.x, y2: minuteHandEnd.y }}
+          transition={{ duration: 0.6, ease: "easeInOut" }}
           stroke={color}
           strokeWidth="7"
           strokeLinecap="round"
@@ -144,6 +192,7 @@ export default function JudgeFigure({
         animate={{ scale: isReacting ? [1, 1.4, 1] : 1 }}
         transition={{ duration: 0.5 }}
       />
+      </motion.g>
     </svg>
   );
 }

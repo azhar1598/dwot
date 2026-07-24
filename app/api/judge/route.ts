@@ -3,11 +3,33 @@ import { checkRateLimit } from "@/lib/rateLimit";
 import { cheapPreFilter } from "@/lib/preFilter";
 import { classifyWithGemini, isGeminiConfigured } from "@/lib/gemini";
 import { mockClassify } from "@/lib/mockClassifier";
-import type { JudgeApiResponse } from "@/types/judge";
+import type { ChatTurn, JudgeApiResponse } from "@/types/judge";
 
 export const runtime = "nodejs";
 
 const MAX_MESSAGE_LENGTH = 500;
+
+// "banter" conversations send prior turns back for context. This is
+// client-supplied and therefore untrusted — capped short both to bound
+// token/cost and because a malicious client could otherwise spoof fake
+// "judge" turns to try to steer future replies. It's context only: every
+// message, history or not, is independently reclassified against the full
+// priority list server-side (see lib/gemini.ts).
+const MAX_HISTORY_TURNS = 8;
+
+function parseHistory(body: Record<string, unknown>): ChatTurn[] {
+  const raw = body.history;
+  if (!Array.isArray(raw)) return [];
+
+  const turns: ChatTurn[] = [];
+  for (const entry of raw.slice(-MAX_HISTORY_TURNS)) {
+    if (typeof entry !== "object" || entry === null) continue;
+    const { role, text } = entry as { role?: unknown; text?: unknown };
+    if ((role !== "user" && role !== "judge") || typeof text !== "string") continue;
+    turns.push({ role, text: text.slice(0, MAX_MESSAGE_LENGTH) });
+  }
+  return turns;
+}
 
 function getClientIp(request: NextRequest): string {
   const forwardedFor = request.headers.get("x-forwarded-for");
@@ -16,8 +38,9 @@ function getClientIp(request: NextRequest): string {
 }
 
 // Deliberately logs only the category — never the raw submission — so we
-// can monitor how often "crisis" fires (to review/improve the fixed
-// crisis-response copy over time) without retaining anyone's actual text.
+// can monitor how often each category fires (e.g. how often "crisis" —
+// derogatory/hateful content about religion or faith — is being caught)
+// without retaining anyone's actual text.
 function logClassification(category: string, source: string) {
   console.log(
     `[judge] ${new Date().toISOString()} category=${category} source=${source}`,
@@ -47,10 +70,10 @@ export async function POST(request: NextRequest) {
     return errorResponse("Invalid request.", 400);
   }
 
+  const bodyObj = typeof body === "object" && body !== null ? (body as Record<string, unknown>) : {};
+
   const message =
-    typeof body === "object" && body !== null && "message" in body && typeof (body as { message: unknown }).message === "string"
-      ? (body as { message: string }).message.trim()
-      : "";
+    "message" in bodyObj && typeof bodyObj.message === "string" ? bodyObj.message.trim() : "";
 
   if (!message) {
     return errorResponse("Type something first.", 400);
@@ -59,6 +82,8 @@ export async function POST(request: NextRequest) {
   if (message.length > MAX_MESSAGE_LENGTH) {
     return errorResponse(`Keep it under ${MAX_MESSAGE_LENGTH} characters.`, 400);
   }
+
+  const history = parseHistory(bodyObj);
 
   // Cheap first pass — catches obvious junk without spending an LLM call.
   // Never the primary safety layer; anything with real content skips this
@@ -75,7 +100,7 @@ export async function POST(request: NextRequest) {
 
   try {
     if (isGeminiConfigured()) {
-      const result = await classifyWithGemini(message);
+      const result = await classifyWithGemini(message, history);
       logClassification(result.category, "gemini");
       return NextResponse.json({ ...result, source: "gemini" } satisfies JudgeApiResponse);
     }

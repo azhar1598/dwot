@@ -5,6 +5,14 @@ import type { JudgeApiResponse, JudgeClassification } from "@/types/judge";
 
 export const MAX_COMPLAINT_LENGTH = 500;
 
+// "crisis" now means derogatory/hateful content about religion or faith (see
+// lib/gemini.ts) — not personal danger or self-harm, which are classified as
+// "serious" and get a normal in-character response. By design, the judge
+// stays completely silent on "crisis": no panel, no reaction, the submission
+// is a no-op. The backend still classifies and logs it the same as always
+// (see app/api/judge/route.ts) for monitoring purposes.
+const STAY_SILENT_ON_CRISIS = true;
+
 export type SubmitStatus = "idle" | "loading";
 
 export function useJudgeChat() {
@@ -36,6 +44,12 @@ export function useJudgeChat() {
 
       if (!res.ok || data.category === "error") {
         setApiError(data.category === "error" ? data.message : "Something went wrong. Try again.");
+        setStatus("idle");
+        return;
+      }
+
+      if (STAY_SILENT_ON_CRISIS && data.category === "crisis") {
+        setMessage("");
         setStatus("idle");
         return;
       }

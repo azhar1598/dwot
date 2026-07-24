@@ -1,3 +1,4 @@
+import Link from "next/link";
 import TickingLogo from "./TickingLogo";
 
 export default function Footer() {
@@ -26,12 +27,12 @@ export default function Footer() {
               <a href="#courtroom-preview" className="hover:text-accent">
                 See a ruling
               </a>
-              <a href="/courtroom" className="hover:text-accent">
+              <Link href="/courtroom" className="hover:text-accent">
                 Enter the courtroom
-              </a>
-              <a href="/trial" className="hover:text-accent">
+              </Link>
+              <Link href="/" className="hover:text-accent">
                 Live trial
-              </a>
+              </Link>
             </div>
             <div className="flex flex-col gap-3">
               <span className="text-foreground">Follow</span>

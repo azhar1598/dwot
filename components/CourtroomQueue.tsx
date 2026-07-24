@@ -18,13 +18,35 @@ type CourtroomQueueProps = {
   requestId: number;
   /** Called from the crisis panel's "Back" button. */
   onReset: () => void;
+  /** The last submission failed (network/API error) — show the judge dozing off instead of a ruling. */
+  errored?: boolean;
+  /**
+   * True while the user is hovering/focused on the complaint input with
+   * nothing actively animating. Brings the visitor in early (standing,
+   * waiting) instead of only appearing once a verdict comes back.
+   */
+  anticipate?: boolean;
+};
+
+const STAGE_TO_VISITOR_PHASE: Record<Stage, VisitorPhase> = {
+  idle: "hidden",
+  enter: "enter",
+  react: "react",
+  exit: "exit",
+  spam: "hidden",
 };
 
 const ENTER_MS = 750;
 const REACT_MS: Record<"minor" | "serious", number> = { minor: 650, serious: 950 };
 const EXIT_MS = 700;
 
-export default function CourtroomQueue({ result, requestId, onReset }: CourtroomQueueProps) {
+export default function CourtroomQueue({
+  result,
+  requestId,
+  onReset,
+  errored = false,
+  anticipate = false,
+}: CourtroomQueueProps) {
   const [stage, setStage] = useState<Stage>("idle");
   const [handColor, setHandColor] = useState<HandColor>("gray");
   const [judgeReactKey, setJudgeReactKey] = useState(0);
@@ -67,7 +89,11 @@ export default function CourtroomQueue({ result, requestId, onReset }: Courtroom
       return;
     }
 
-    const category = result.category; // "minor" | "serious"
+    // This single-shot animated flow only knows two visual treatments. Any
+    // category outside "serious" (crisis/spam are already handled above) —
+    // including "banter", which gets full two-way chat treatment on the
+    // trial page instead — falls back to the "minor" visual here.
+    const category: "minor" | "serious" = result.category === "serious" ? "serious" : "minor";
 
     const t0 = setTimeout(() => {
       setStage("enter");
@@ -101,12 +127,23 @@ export default function CourtroomQueue({ result, requestId, onReset }: Courtroom
     return <CrisisPanel onReset={onReset} />;
   }
 
-  const visitorPhase: VisitorPhase =
-    stage === "enter" ? "enter" : stage === "react" ? "react" : stage === "exit" ? "exit" : "hidden";
+  // Idle + anticipate (hovering/focused on the input, nothing animating yet)
+  // walks the visitor in early as a preview — but only before any verdict has
+  // been revealed yet. Once a case has been ruled on, the visitor has made
+  // their exit for good; merely resting focus/hover on the input (e.g. after
+  // pressing Enter, which never blurs it) must not pull them back on stage.
+  // A genuinely new submission still takes over normally, since `stage`
+  // moves off "idle" at that point regardless of `revealed`.
+  const waitingEarly = stage === "idle" && anticipate && !revealed;
+  const visitorPhase: VisitorPhase = waitingEarly ? "enter" : STAGE_TO_VISITOR_PHASE[stage];
   const visitorCategory = result?.category === "serious" ? "serious" : "minor";
-  const showVisitor = stage === "enter" || stage === "react" || stage === "exit";
-  const showStamp = result?.category === "serious" && revealed;
-  const showGavel = result?.category === "serious" && stage === "react";
+  const showVisitor = !errored && (stage === "enter" || stage === "react" || stage === "exit" || waitingEarly);
+  // Hovering/focusing the input while a previous ruling is still on display
+  // is read as "about to file a new case" — clear the old stamp so it
+  // doesn't linger over what you're about to type next. Stepping away again
+  // without submitting restores it, since nothing has actually changed.
+  const showStamp = !errored && result?.category === "serious" && revealed && !anticipate;
+  const showGavel = !errored && result?.category === "serious" && stage === "react";
 
   return (
     <div className="flex flex-col gap-6">
@@ -114,7 +151,12 @@ export default function CourtroomQueue({ result, requestId, onReset }: Courtroom
         <StampOverlay visible={showStamp} />
 
         <div className="flex flex-col items-center pt-10">
-          <JudgeFigure handColor={handColor} reactKey={judgeReactKey} className="h-36 w-36 sm:h-44 sm:w-44" />
+          <JudgeFigure
+            handColor={handColor}
+            reactKey={judgeReactKey}
+            asleep={errored}
+            className="h-36 w-36 sm:h-44 sm:w-44"
+          />
           <Bench className="-mt-4 w-full" />
         </div>
 
@@ -134,7 +176,7 @@ export default function CourtroomQueue({ result, requestId, onReset }: Courtroom
         </div>
       </div>
 
-      <VerdictText result={result} revealed={revealed} />
+      <VerdictText result={result} revealed={revealed} errored={errored} />
     </div>
   );
 }
@@ -142,10 +184,20 @@ export default function CourtroomQueue({ result, requestId, onReset }: Courtroom
 function VerdictText({
   result,
   revealed,
+  errored,
 }: {
   result: JudgeClassification | null;
   revealed: boolean;
+  errored: boolean;
 }) {
+  if (errored) {
+    return (
+      <p className="text-center font-mono text-xs uppercase tracking-widest text-muted">
+        The judge has dozed off. Try again in a moment.
+      </p>
+    );
+  }
+
   if (!result) {
     return (
       <p className="text-center font-mono text-xs uppercase tracking-widest text-muted">
@@ -164,7 +216,7 @@ function VerdictText({
 
   if (!revealed) return null;
 
-  if (result.category === "minor") {
+  if (result.category === "minor" || result.category === "banter") {
     return (
       <div className="flex flex-col items-center gap-2 text-center">
         <p className="font-display text-xl font-bold text-approve sm:text-2xl">

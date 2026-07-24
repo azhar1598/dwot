@@ -31,6 +31,15 @@ export default function ChatInput({
     handleReset: handleChatReset,
   } = useJudgeChat();
   const [letterState, setLetterState] = useState<LetterState>({ status: "idle" });
+  const [inputActive, setInputActive] = useState(false);
+
+  // A fresh verdict clears any residual hover/focus from typing the previous
+  // complaint (e.g. the mouse never moved after pressing Enter) so the new
+  // stamp/verdict is guaranteed visible. Hovering the input again afterwards
+  // is then read as a genuine "starting a new case" gesture.
+  useEffect(() => {
+    setInputActive(false);
+  }, [requestId]);
 
   const isCrisis = result?.category === "crisis";
   const wantsLetter = result?.category === "minor" || result?.category === "serious";
@@ -113,6 +122,10 @@ export default function ChatInput({
             rows={3}
             placeholder="The ward office has had my file for eleven months..."
             disabled={status === "loading"}
+            onMouseEnter={() => setInputActive(true)}
+            onMouseLeave={() => setInputActive(false)}
+            onFocus={() => setInputActive(true)}
+            onBlur={() => setInputActive(false)}
             className="w-full resize-none border border-line bg-transparent px-4 py-3 font-mono text-sm text-foreground placeholder:text-muted focus:border-accent focus:outline-none disabled:opacity-60"
           />
           <div className="flex items-center justify-between">
@@ -133,7 +146,13 @@ export default function ChatInput({
         </form>
       )}
 
-      <CourtroomQueue result={result} requestId={requestId} onReset={handleReset} />
+      <CourtroomQueue
+        result={result}
+        requestId={requestId}
+        onReset={handleReset}
+        errored={!!apiError}
+        anticipate={inputActive}
+      />
 
       {wantsLetter && letterState.status === "loading" && (
         <p className="font-mono text-xs text-muted">Drafting a formal letter…</p>
