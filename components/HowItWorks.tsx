@@ -3,23 +3,23 @@ import SectionLabel from "./SectionLabel";
 const steps = [
   {
     num: "01",
-    title: "Submit a link",
-    copy: "Found a video of a stalled office, a pothole nobody's fixed, or a queue that hasn't moved in hours? Drop the public link — Instagram, YouTube, X, wherever it lives.",
+    title: "Name your constituency",
+    copy: "Pick your State, District, and Constituency. That's how we know which MP or MLA your letter should actually reach.",
   },
   {
     num: "02",
-    title: "Moderation review",
-    copy: "Every submission is checked for source, context, and public interest before it goes anywhere near the ledger. No anonymous accusations, no doctored clips.",
+    title: "State your case",
+    copy: "Type the complaint the way you'd actually say it — stalled paperwork, a pothole, a queue that never moves. No forms, no formatting required.",
   },
   {
     num: "03",
-    title: "Published to the ledger",
-    copy: "Verified evidence is timestamped, tagged, and added to the public record. It stays there — permanently, and citably.",
+    title: "Justice Clockwork rules",
+    copy: "The AI judge classifies and reacts in character. Genuine emergencies are routed straight to real help — never joked about, never delayed.",
   },
   {
     num: "04",
-    title: "Shared & amplified",
-    copy: "The ledger gets pushed out until the right people see it. Patterns get flagged. Repeat offenders get named.",
+    title: "Send the letter",
+    copy: "A formal, non-vulgar grievance letter is drafted automatically. Review it, fix anything you want, then send it straight from your own email client.",
   },
 ];
 
@@ -30,7 +30,7 @@ export default function HowItWorks() {
         <SectionLabel index="§1">How it works</SectionLabel>
 
         <h2 className="max-w-2xl font-display text-3xl font-bold leading-tight text-foreground sm:text-4xl">
-          Four steps from your phone to the public record.
+          Four steps from a rant to a real letter.
         </h2>
 
         <div className="mt-14 grid grid-cols-1 gap-px border border-line bg-line sm:grid-cols-2 lg:grid-cols-4">

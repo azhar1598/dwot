@@ -3,6 +3,10 @@ type TickingLogoProps = {
   title?: string;
 };
 
+function round(value: number) {
+  return Math.round(value * 1000) / 1000;
+}
+
 export default function TickingLogo({
   className = "h-10 w-10",
   title = "Don't Waste Our Time",
@@ -47,10 +51,12 @@ export default function TickingLogo({
         const angle = (i * 30 * Math.PI) / 180;
         const r1 = 58;
         const r2 = i % 3 === 0 ? 50 : 54;
-        const x1 = 100 + r1 * Math.sin(angle);
-        const y1 = 96 - r1 * Math.cos(angle);
-        const x2 = 100 + r2 * Math.sin(angle);
-        const y2 = 96 - r2 * Math.cos(angle);
+        // Rounded to avoid server/client floating-point serialization drift
+        // (Math.sin/cos can differ in the last decimal between JS engines).
+        const x1 = round(100 + r1 * Math.sin(angle));
+        const y1 = round(96 - r1 * Math.cos(angle));
+        const x2 = round(100 + r2 * Math.sin(angle));
+        const y2 = round(96 - r2 * Math.cos(angle));
         return (
           <line
             key={i}

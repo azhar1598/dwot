@@ -11,22 +11,23 @@ export default function ReferralBlock() {
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-[1fr_auto] lg:items-center">
           <div className="flex flex-col gap-6">
             <h2 className="max-w-xl font-display text-3xl font-bold leading-tight text-foreground sm:text-4xl">
-              The clock is ticking. Get on the ledger before it opens.
+              The clock is ticking. The courtroom is already open.
             </h2>
             <p className="max-w-xl font-mono text-sm leading-relaxed text-muted">
-              We&apos;re onboarding submitters in waves. Join the list now,
-              and refer three friends to unlock early submission access —
-              before public review opens to everyone.
+              Join the list to hear about new states, new features, and
+              improvements to how letters get drafted. Refer three friends
+              and we&apos;ll prioritize your feedback when new constituencies
+              go live.
             </p>
 
-            <EmailCapture buttonLabel="Get early access" />
+            <EmailCapture buttonLabel="Get updates" />
 
             <div className="mt-2 flex items-center gap-4 border border-line px-5 py-4 font-mono text-xs text-muted">
               <span className="text-2xl text-accent">3×</span>
               <span>
-                Refer 3 friends who join the waitlist →{" "}
+                Refer 3 friends who join the list →{" "}
                 <span className="text-foreground">
-                  unlock early submission access
+                  jump the queue for feature requests
                 </span>
                 . Referral links go out with your confirmation email.
               </span>

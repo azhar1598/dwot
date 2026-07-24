@@ -1,3 +1,4 @@
+import Link from "next/link";
 import TickingLogo from "./TickingLogo";
 import EmailCapture from "./EmailCapture";
 
@@ -36,6 +37,12 @@ export default function Hero() {
           <span className="font-mono text-xs text-muted">
             No spam. One email when submissions open. That&apos;s it.
           </span>
+          <Link
+            href="/courtroom"
+            className="mt-2 inline-flex w-fit items-center gap-2 font-mono text-xs uppercase tracking-widest text-accent hover:text-foreground"
+          >
+            Or skip the wait — try the courtroom now →
+          </Link>
         </div>
       </div>
 
