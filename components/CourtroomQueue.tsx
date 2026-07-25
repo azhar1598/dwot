@@ -208,13 +208,13 @@ export default function CourtroomQueue({
           <Gavel active={showGavel} className="h-full w-full" />
         </div>
 
-        <div className="flex h-28 items-end justify-center pb-6">
+        <div className="relative z-10 flex h-28 items-end justify-center pb-6">
           {showVisitor && (
             <VisitorAvatar
               phase={visitorPhase}
               category={visitorCategory}
               colorIndex={requestId}
-              className="h-24 w-16"
+              className="h-24 w-16 shrink-0 overflow-visible"
             />
           )}
         </div>
