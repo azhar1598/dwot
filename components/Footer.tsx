@@ -1,3 +1,4 @@
+import Link from "next/link";
 import TickingLogo from "./TickingLogo";
 
 export default function Footer() {
@@ -23,12 +24,15 @@ export default function Footer() {
               <a href="#how-it-works" className="hover:text-accent">
                 How it works
               </a>
-              <a href="#ledger" className="hover:text-accent">
-                The ledger
+              <a href="#courtroom-preview" className="hover:text-accent">
+                See a ruling
               </a>
-              <a href="#submit" className="hover:text-accent">
-                Submit a link
-              </a>
+              <Link href="/courtroom" className="hover:text-accent">
+                Enter the courtroom
+              </Link>
+              <Link href="/" className="hover:text-accent">
+                Live trial
+              </Link>
             </div>
             <div className="flex flex-col gap-3">
               <span className="text-foreground">Follow</span>
@@ -69,10 +73,11 @@ export default function Footer() {
 
         <div className="mt-14 flex flex-col gap-4 border-t border-line pt-6 font-mono text-[11px] text-muted sm:flex-row sm:items-center sm:justify-between">
           <span>
-            © {new Date().getFullYear()} Don&apos;t Waste Our Time. A citizen
-            ledger, not a legal filing.
+            © {new Date().getFullYear()}{" "}
+            Don&apos;t Waste Our Time. Satirical courtroom, real letters — not
+            a legal filing.
           </span>
-          <span>We curate public links. We don&apos;t host media.</span>
+          <span>Nothing is auto-sent. You review every letter first.</span>
         </div>
       </div>
     </footer>

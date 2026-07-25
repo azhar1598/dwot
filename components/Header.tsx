@@ -13,23 +13,12 @@ export default function Header() {
             OUR TIME
           </span>
         </Link>
-        <nav className="hidden items-center gap-8 font-mono text-xs uppercase tracking-widest text-muted sm:flex">
-          <a href="#how-it-works" className="hover:text-foreground">
-            How it works
-          </a>
-          <a href="#ledger" className="hover:text-foreground">
-            The ledger
-          </a>
-          <a href="#submit" className="hover:text-foreground">
-            Submit
-          </a>
-        </nav>
-        <a
-          href="#waitlist"
+        <Link
+          href="/landing#waitlist"
           className="border border-foreground px-4 py-2 font-mono text-xs font-bold uppercase tracking-wider text-foreground transition-colors hover:border-accent hover:bg-accent"
         >
           Join
-        </a>
+        </Link>
       </div>
     </header>
   );

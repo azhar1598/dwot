@@ -15,7 +15,7 @@ type Status = "idle" | "loading" | "success" | "error";
 
 export default function EmailCapture({
   placeholder = "you@email.com",
-  buttonLabel = "Join the ledger",
+  buttonLabel = "Join the list",
   compact = false,
 }: EmailCaptureProps) {
   const [email, setEmail] = useState("");
@@ -50,7 +50,7 @@ export default function EmailCapture({
         }`}
       >
         <span className="text-accent">✓ LOGGED.</span> You&apos;re on the
-        record. We&apos;ll email you when submissions open.
+        list. We&apos;ll email you when there&apos;s something new.
       </div>
     );
   }

@@ -21,16 +21,16 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Don't Waste Our Time — A Public Ledger of Wasted Time",
+  title: "Don't Waste Our Time — Turn Your Complaint Into a Real Letter",
   description:
-    "A citizen-journalism platform curating public evidence of civic neglect, institutional delay, and public inefficiency in India. Submit a link. We log it. Publicly, permanently.",
+    "Type your civic complaint into the courtroom of Justice Clockwork. Get a satirical verdict, and a real, formal grievance letter drafted and ready to send to your MP or MLA.",
   icons: {
     icon: "/logo.png",
   },
   openGraph: {
     title: "Don't Waste Our Time",
     description:
-      "A public ledger of civic neglect, institutional delay, and public inefficiency in India.",
+      "A satirical AI courtroom that turns your civic complaint into a real, formal letter for your MP or MLA.",
     images: ["/logo.png"],
   },
 };

@@ -2,20 +2,20 @@ import SectionLabel from "./SectionLabel";
 
 const points = [
   {
-    title: "We don't host media",
-    copy: "The ledger only links to and embeds content that's already public on Instagram, YouTube, or X. We never re-upload, re-host, or store video files ourselves.",
+    title: "Crisis always overrides the joke",
+    copy: "Every submission is screened for genuine danger or distress before the judge persona ever sees it. If flagged, the satire is skipped entirely and you're shown real helpline numbers — not a punchline.",
   },
   {
-    title: "Every entry is reviewed",
-    copy: "A human moderation pass checks source, context, and public-interest relevance before anything is published. Submissions that fail review are discarded, not published.",
+    title: "AI can be wrong — nothing sends itself",
+    copy: "Your representative's name, contact, and letter text are AI-suggested, not verified fact. Every field stays editable, and the letter only leaves via your own email client after you review it.",
   },
   {
     title: "This isn't a legal filing",
-    copy: "The ledger is a public record of publicly available evidence — not a legal complaint, verdict, or accusation of wrongdoing by any named individual.",
+    copy: "The courtroom is satire, and the letter it drafts is a citizen grievance — not a legal complaint, verdict, or accusation. It carries no official standing on its own.",
   },
   {
-    title: "Takedowns are respected",
-    copy: "If you're featured in an entry and believe it's inaccurate, out of context, or should be removed, contact us and we'll review it promptly.",
+    title: "Nothing is stored beyond your session",
+    copy: "No accounts, no message history saved server-side. We log which category a submission fell into — never the text itself — solely to monitor how often real crises are being caught.",
   },
 ];
 
@@ -23,10 +23,10 @@ export default function TrustNote() {
   return (
     <section className="border-b border-line">
       <div className="mx-auto max-w-6xl px-6 py-20 sm:py-28">
-        <SectionLabel index="§4">Trust &amp; accountability</SectionLabel>
+        <SectionLabel index="§4">Trust &amp; safety</SectionLabel>
 
         <h2 className="max-w-2xl font-display text-3xl font-bold leading-tight text-foreground sm:text-4xl">
-          We curate public evidence. We don&apos;t create it.
+          The bit stops the moment it isn&apos;t funny anymore.
         </h2>
 
         <div className="mt-12 grid grid-cols-1 gap-10 sm:grid-cols-2">
