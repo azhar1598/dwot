@@ -1,11 +1,13 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { motion } from "framer-motion";
 import JudgeFigure, { type HandColor } from "./courtroom/JudgeFigure";
 import Bench from "./courtroom/Bench";
 import VisitorAvatar, { type VisitorPhase } from "./courtroom/VisitorAvatar";
 import Gavel from "./courtroom/Gavel";
 import StampOverlay from "./courtroom/StampOverlay";
+import FileIcon from "./courtroom/FileIcon";
 import CrisisPanel from "./CrisisPanel";
 import type { JudgeClassification } from "@/types/judge";
 
@@ -26,6 +28,8 @@ type CourtroomQueueProps = {
    * waiting) instead of only appearing once a verdict comes back.
    */
   anticipate?: boolean;
+  /** True while the request to /api/judge is in flight — shows a "filing" holding pattern. */
+  submitting?: boolean;
 };
 
 const STAGE_TO_VISITOR_PHASE: Record<Stage, VisitorPhase> = {
@@ -46,6 +50,7 @@ export default function CourtroomQueue({
   onReset,
   errored = false,
   anticipate = false,
+  submitting = false,
 }: CourtroomQueueProps) {
   const [stage, setStage] = useState<Stage>("idle");
   const [handColor, setHandColor] = useState<HandColor>("gray");
@@ -127,6 +132,10 @@ export default function CourtroomQueue({
     return <CrisisPanel onReset={onReset} />;
   }
 
+  // While the /api/judge request is actually in flight, `stage` is still
+  // "idle" (the enter/react/exit sequence only starts once a result lands).
+  // Use that window to show a "filing" holding pattern instead of dead air.
+  const filing = submitting && stage === "idle";
   // Idle + anticipate (hovering/focused on the input, nothing animating yet)
   // walks the visitor in early as a preview — but only before any verdict has
   // been revealed yet. Once a case has been ruled on, the visitor has made
@@ -135,14 +144,16 @@ export default function CourtroomQueue({
   // A genuinely new submission still takes over normally, since `stage`
   // moves off "idle" at that point regardless of `revealed`.
   const waitingEarly = stage === "idle" && anticipate && !revealed;
-  const visitorPhase: VisitorPhase = waitingEarly ? "enter" : STAGE_TO_VISITOR_PHASE[stage];
+  const previewPhase = filing || waitingEarly;
+  const visitorPhase: VisitorPhase = previewPhase ? "enter" : STAGE_TO_VISITOR_PHASE[stage];
   const visitorCategory = result?.category === "serious" ? "serious" : "minor";
-  const showVisitor = !errored && (stage === "enter" || stage === "react" || stage === "exit" || waitingEarly);
+  const showVisitor = !errored && (stage === "enter" || stage === "react" || stage === "exit" || previewPhase);
   // Hovering/focusing the input while a previous ruling is still on display
   // is read as "about to file a new case" — clear the old stamp so it
   // doesn't linger over what you're about to type next. Stepping away again
-  // without submitting restores it, since nothing has actually changed.
-  const showStamp = !errored && result?.category === "serious" && revealed && !anticipate;
+  // without submitting restores it, since nothing has actually changed. An
+  // actual submission in flight always wins over a stale stamp.
+  const showStamp = !errored && !filing && result?.category === "serious" && revealed && !anticipate;
   const showGavel = !errored && result?.category === "serious" && stage === "react";
 
   return (
@@ -164,7 +175,7 @@ export default function CourtroomQueue({
           <Gavel active={showGavel} className="h-full w-full" />
         </div>
 
-        <div className="flex h-28 items-end justify-center pb-6">
+        <div className="relative flex h-28 items-end justify-center pb-6">
           {showVisitor && (
             <VisitorAvatar
               phase={visitorPhase}
@@ -173,10 +184,15 @@ export default function CourtroomQueue({
               className="h-24 w-16"
             />
           )}
+          {filing && (
+            <div className="absolute -top-1 left-1/2 -translate-x-1/2">
+              <FileIcon className="h-8 w-8" />
+            </div>
+          )}
         </div>
       </div>
 
-      <VerdictText result={result} revealed={revealed} errored={errored} />
+      <VerdictText result={result} revealed={revealed} errored={errored} filing={filing} />
     </div>
   );
 }
@@ -185,11 +201,25 @@ function VerdictText({
   result,
   revealed,
   errored,
+  filing,
 }: {
   result: JudgeClassification | null;
   revealed: boolean;
   errored: boolean;
+  filing: boolean;
 }) {
+  if (filing) {
+    return (
+      <motion.p
+        className="text-center font-mono text-xs uppercase tracking-widest text-muted"
+        animate={{ opacity: [0.4, 1, 0.4] }}
+        transition={{ duration: 1.3, repeat: Infinity, ease: "easeInOut" }}
+      >
+        Filing your case with the court…
+      </motion.p>
+    );
+  }
+
   if (errored) {
     return (
       <p className="text-center font-mono text-xs uppercase tracking-widest text-muted">

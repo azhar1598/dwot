@@ -152,6 +152,7 @@ export default function ChatInput({
         onReset={handleReset}
         errored={!!apiError}
         anticipate={inputActive}
+        submitting={status === "loading"}
       />
 
       {wantsLetter && letterState.status === "loading" && (

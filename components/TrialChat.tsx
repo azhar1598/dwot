@@ -49,6 +49,7 @@ export default function TrialChat() {
               onReset={handleReset}
               errored={!!apiError}
               anticipate={inputActive}
+              submitting={status === "loading"}
             />
           </div>
         )}
