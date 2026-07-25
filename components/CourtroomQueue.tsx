@@ -60,10 +60,19 @@ export default function CourtroomQueue({
   // finishes — the ruling should stay visible until the next submission,
   // not flash for a second and vanish.
   const [revealed, setRevealed] = useState(false);
+  // Delays the filed document appearing on the bench until the visitor has
+  // actually walked in and settled, rather than both popping in at once.
+  const [fileVisible, setFileVisible] = useState(false);
   const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
+  // Tracks which requestId the animation effect below has actually started
+  // handling. Read (never written) during render to detect the one-render
+  // gap where `result`/`requestId` already point at a fresh submission but
+  // this effect — which drives `stage` — hasn't run for it yet.
+  const processedRequestId = useRef(requestId);
 
   useEffect(() => {
     timers.current.forEach(clearTimeout);
+    processedRequestId.current = requestId;
 
     // Every transition below runs inside a timer callback (even the
     // immediate one, via a 0ms timeout) rather than synchronously in the
@@ -128,14 +137,26 @@ export default function CourtroomQueue({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [requestId]);
 
-  if (result?.category === "crisis") {
-    return <CrisisPanel onReset={onReset} />;
-  }
-
   // While the /api/judge request is actually in flight, `stage` is still
   // "idle" (the enter/react/exit sequence only starts once a result lands).
   // Use that window to show a "filing" holding pattern instead of dead air.
   const filing = submitting && stage === "idle";
+
+  // The document only appears once the visitor has had time to walk in and
+  // settle — never at the same instant they arrive.
+  useEffect(() => {
+    if (!filing) {
+      setFileVisible(false);
+      return;
+    }
+    const t = setTimeout(() => setFileVisible(true), 800);
+    return () => clearTimeout(t);
+  }, [filing]);
+
+  if (result?.category === "crisis") {
+    return <CrisisPanel onReset={onReset} />;
+  }
+
   // Idle + anticipate (hovering/focused on the input, nothing animating yet)
   // walks the visitor in early as a preview — but only before any verdict has
   // been revealed yet. Once a case has been ruled on, the visitor has made
@@ -144,7 +165,17 @@ export default function CourtroomQueue({
   // A genuinely new submission still takes over normally, since `stage`
   // moves off "idle" at that point regardless of `revealed`.
   const waitingEarly = stage === "idle" && anticipate && !revealed;
-  const previewPhase = filing || waitingEarly;
+  // Bridges the one-render gap between the fetch resolving (result/requestId
+  // already updated) and the animation effect's own 0ms timer actually
+  // flipping `stage` to "enter" for that new requestId. Without this, the
+  // visitor briefly unmounts and remounts from scratch — replaying its
+  // walk-in animation as if a second, different visitor had shown up.
+  const awaitingEnter =
+    stage === "idle" &&
+    processedRequestId.current !== requestId &&
+    !!result &&
+    result.category !== "spam";
+  const previewPhase = filing || waitingEarly || awaitingEnter;
   const visitorPhase: VisitorPhase = previewPhase ? "enter" : STAGE_TO_VISITOR_PHASE[stage];
   const visitorCategory = result?.category === "serious" ? "serious" : "minor";
   const showVisitor = !errored && (stage === "enter" || stage === "react" || stage === "exit" || previewPhase);
@@ -168,14 +199,16 @@ export default function CourtroomQueue({
             asleep={errored}
             className="h-36 w-36 sm:h-44 sm:w-44"
           />
-          <Bench className="-mt-4 w-full" />
+          <Bench className="-mt-4 w-full">
+            {fileVisible && <FileIcon className="h-8 w-8" />}
+          </Bench>
         </div>
 
         <div className="absolute left-1/2 top-16 h-16 w-16 -translate-x-1/2 sm:top-20">
           <Gavel active={showGavel} className="h-full w-full" />
         </div>
 
-        <div className="relative flex h-28 items-end justify-center pb-6">
+        <div className="flex h-28 items-end justify-center pb-6">
           {showVisitor && (
             <VisitorAvatar
               phase={visitorPhase}
@@ -183,11 +216,6 @@ export default function CourtroomQueue({
               colorIndex={requestId}
               className="h-24 w-16"
             />
-          )}
-          {filing && (
-            <div className="absolute -top-1 left-1/2 -translate-x-1/2">
-              <FileIcon className="h-8 w-8" />
-            </div>
           )}
         </div>
       </div>

@@ -18,9 +18,14 @@ export default function FileIcon({ className = "h-8 w-8" }: FileIconProps) {
       className={className}
       role="img"
       aria-label="Filing paperwork"
-      initial={{ y: 0, rotate: -4 }}
-      animate={{ y: [0, -5, 0], rotate: [-4, 4, -4] }}
-      transition={{ duration: 1.4, repeat: Infinity, ease: "easeInOut" }}
+      initial={{ scale: 0, opacity: 0, y: 0, rotate: -4 }}
+      animate={{ scale: 1, opacity: 1, y: [0, -5, 0], rotate: [-4, 4, -4] }}
+      transition={{
+        scale: { duration: 0.35, ease: "backOut" },
+        opacity: { duration: 0.25 },
+        y: { duration: 1.4, repeat: Infinity, ease: "easeInOut", delay: 0.35 },
+        rotate: { duration: 1.4, repeat: Infinity, ease: "easeInOut", delay: 0.35 },
+      }}
     >
       <rect x="6" y="3" width="20" height="26" rx="1.5" fill="var(--figure)" stroke="#1a1a1a" strokeWidth="1" />
       <path d="M20 3 L26 9 L20 9 Z" fill="#cfcfcb" />

@@ -13,7 +13,7 @@ const steps = [
   },
   {
     num: "03",
-    title: "Justice Clockwork rules",
+    title: "Justice Jojo rules",
     copy: "The AI judge classifies and reacts in character. Genuine emergencies are routed straight to real help — never joked about, never delayed.",
   },
   {

@@ -164,7 +164,7 @@ const BANTER_SIGNALS = [
 const BANTER_REPLIES = [
   "Off the record? Fascinating. On the record, this bench has no jurisdiction over that. What else is on your mind?",
   "The court finds this mildly diverting. Go on — though I promise nothing resembling a verdict.",
-  "Justice Clockwork has opinions about this too, actually. What's your take?",
+  "Justice Jojo has opinions about this too, actually. What's your take?",
 ];
 
 function includesAny(haystack: string, needles: string[]) {

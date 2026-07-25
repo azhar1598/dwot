@@ -23,7 +23,7 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   title: "Don't Waste Our Time — Turn Your Complaint Into a Real Letter",
   description:
-    "Type your civic complaint into the courtroom of Justice Clockwork. Get a satirical verdict, and a real, formal grievance letter drafted and ready to send to your MP or MLA.",
+    "Type your civic complaint into the courtroom of Justice Jojo. Get a satirical verdict, and a real, formal grievance letter drafted and ready to send to your MP or MLA.",
   icons: {
     icon: "/logo.png",
   },
