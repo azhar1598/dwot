@@ -49,9 +49,9 @@ export default function JudgeFigure({
       viewBox="0 0 240 280"
       className={className}
       role="img"
-      aria-label={asleep ? "Justice Clockwork, dozed off" : "Justice Clockwork"}
+      aria-label={asleep ? "Justice Jojo, dozed off" : "Justice Jojo"}
     >
-      <title>{asleep ? "Justice Clockwork, dozed off" : "Justice Clockwork"}</title>
+      <title>{asleep ? "Justice Jojo, dozed off" : "Justice Jojo"}</title>
 
       <motion.g
         animate={

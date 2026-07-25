@@ -7,7 +7,7 @@ import TickingLogo from "./TickingLogo";
 function JudgeAvatar() {
   return (
     <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-line bg-background text-foreground">
-      <TickingLogo className="h-4 w-4" title="Justice Clockwork" />
+      <TickingLogo className="h-4 w-4" title="Justice Jojo" />
     </span>
   );
 }
@@ -29,7 +29,7 @@ export default function ChatThread({ messages, isLoading, onReset }: ChatThreadP
     <div className="mx-auto flex w-full max-w-lg flex-col gap-4">
       <div className="flex items-center justify-between border-b border-line pb-3">
         <span className="font-mono text-xs uppercase tracking-widest text-muted">
-          Off the record with Justice Clockwork
+          Off the record with Justice Jojo
         </span>
         <button
           type="button"

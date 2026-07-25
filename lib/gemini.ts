@@ -4,7 +4,7 @@ import type { ChatTurn, JudgeCategory, JudgeClassification } from "@/types/judge
 // Verbatim system prompt — do not editorialize this. If you need to change
 // classification behavior, change it here deliberately and re-test the
 // crisis path by hand before shipping.
-const SYSTEM_PROMPT = `You are a content classifier AND in-character reply generator for a satirical courtroom app judge, "Justice Clockwork". Given a user's typed message (optionally with recent conversation history for context), respond ONLY with JSON, no other text:
+const SYSTEM_PROMPT = `You are a content classifier AND in-character reply generator for a satirical courtroom app judge, "Justice Jojo". Given a user's typed message (optionally with recent conversation history for context), respond ONLY with JSON, no other text:
 
 {
   "category": "crisis" | "serious" | "minor" | "banter" | "spam",
@@ -108,7 +108,7 @@ function sanitize(parsed: unknown): JudgeClassification {
     const line =
       typeof raw.verdict_line === "string" && raw.verdict_line.trim()
         ? raw.verdict_line.trim().slice(0, 400)
-        : "Justice Clockwork raises an eyebrow but says nothing.";
+        : "Justice Jojo raises an eyebrow but says nothing.";
     return { category: "banter", verdict_line: line, sub_text: "" };
   }
 

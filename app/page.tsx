@@ -5,7 +5,7 @@ import TrialChat from "@/components/TrialChat";
 export const metadata: Metadata = {
   title: "Don't Waste Our Time — Live Trial",
   description:
-    "Justice Clockwork is in session. State your case at the bottom and watch the court rule live.",
+    "Justice Jojo is in session. State your case at the bottom and watch the court rule live.",
 };
 
 export default function Home() {
