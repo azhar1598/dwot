@@ -108,20 +108,12 @@ export default function Header() {
 
             <div className="mt-6 space-y-4 font-mono text-sm leading-relaxed text-muted">
               <p>
-                <strong className="text-foreground">Real civic complaint?</strong> Jojo hears the
-                case, delivers a satirical ruling, and keeps the response focused on the issue.
+                <strong className="text-foreground">Real civic issue?</strong> Expect the stamp:
+                DON&apos;T WASTE OUR TIME.
               </p>
               <p>
                 <strong className="text-foreground">Light controversy?</strong> The courtroom turns
                 into a two-way conversation until you reset the case.
-              </p>
-              <p>
-                <strong className="text-foreground">Political gossip or wasted time?</strong> Expect
-                the stamp: DON&apos;T WASTE OUR TIME.
-              </p>
-              <p>
-                <strong className="text-foreground">Derogatory remarks about a faith?</strong> Jojo
-                will not engage.
               </p>
             </div>
 
